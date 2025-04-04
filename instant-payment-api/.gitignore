@@ -1,0 +1,31 @@
+# === Java/Maven ===
+/target/
+*.log
+*.class
+
+# === IntelliJ IDEA ===
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# === OS junk ===
+.DS_Store
+Thumbs.db
+
+# === Logs ===
+*.log
+
+
+# === Maven build logs ===
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+
+# === Test output ===
+*.txt
+*.xml
+surefire-reports/
+
+
+# === Lombok config ===
+lombok.config
