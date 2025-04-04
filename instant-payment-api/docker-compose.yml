@@ -13,7 +13,7 @@ services:
 
   kafka:
     image: 'bitnami/kafka:latest'
-
+    container_name: kafka-kraft
     environment:
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
