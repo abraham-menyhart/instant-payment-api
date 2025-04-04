@@ -22,39 +22,52 @@ public class PaymentService {
 
     @Transactional
     public Transaction processPayment(Long senderId, Long receiverId, BigDecimal amount) {
-        // Lock accounts to prevent race conditions
-        Account sender = accountRepository.findByIdForUpdate(senderId)
-                .orElseThrow(() -> new RuntimeException("Sender account not found."));
-        Account receiver = accountRepository.findByIdForUpdate(receiverId)
-                .orElseThrow(() -> new RuntimeException("Receiver account not found."));
+        Account sender = getAccountForUpdate(senderId, "Sender account not found.");
+        Account receiver = getAccountForUpdate(receiverId, "Receiver account not found.");
 
-        // Check balance
+        checkSufficientBalance(sender, amount);
+
+        updateBalances(sender, receiver, amount);
+
+        accountRepository.save(sender);
+        accountRepository.save(receiver);
+        Transaction transaction = saveTransactionLog(senderId, receiverId, amount);
+
+        publishNotification(senderId, receiverId, amount);
+
+        return transaction;
+    }
+
+    private Account getAccountForUpdate(Long accountId, String errorMessage) {
+        return accountRepository.findByIdForUpdate(accountId)
+                .orElseThrow(() -> new RuntimeException(errorMessage));
+    }
+
+    private void checkSufficientBalance(Account sender, BigDecimal amount) {
         if (sender.getBalance().compareTo(amount) < 0) {
             throw new RuntimeException("Insufficient balance in sender's account.");
         }
+    }
 
-        // Deduct from sender, add to receiver
+    private void updateBalances(Account sender, Account receiver, BigDecimal amount) {
         sender.setBalance(sender.getBalance().subtract(amount));
         receiver.setBalance(receiver.getBalance().add(amount));
+    }
 
-        // Save updates
-        accountRepository.save(sender);
-        accountRepository.save(receiver);
-
-        // Save transaction log
+    private Transaction saveTransactionLog(Long senderId, Long receiverId, BigDecimal amount) {
         Transaction transaction = new Transaction();
         transaction.setSenderAccountId(senderId);
         transaction.setReceiverAccountId(receiverId);
         transaction.setAmount(amount);
         transaction.setTimestamp(LocalDateTime.now());
-        transaction = transactionRepository.save(transaction);
+        return transactionRepository.save(transaction);
+    }
 
-        // Publish notification event to Kafka
-        String notification = "Transaction from " + senderId + " to " + receiverId
-                + " for amount " + amount + " completed.";
+    private void publishNotification(Long senderId, Long receiverId, BigDecimal amount) {
+        String notification = String.format(
+                "Transaction from %d to %d for amount %s completed.",
+                senderId, receiverId, amount
+        );
         kafkaTemplate.send("transaction-notifications", notification);
-
-        return transaction;
     }
 }
-
