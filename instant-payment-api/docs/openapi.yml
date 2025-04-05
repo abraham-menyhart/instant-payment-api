@@ -1,0 +1,87 @@
+openapi: 3.0.3
+info:
+  title: Instant Payment API
+  version: "1.0.0"
+  description: |
+    This API handles instant payment transactions from one account
+    to another, storing the transaction in a PostgreSQL database
+    and notifying via Kafka.
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /api/payments:
+    post:
+      summary: Send money from one account to another
+      description: Transfers the specified amount from `senderId` to `receiverId`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '200':
+          description: Successful transfer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Failed to process (e.g. insufficient balance, invalid input)
+
+components:
+  schemas:
+    PaymentRequest:
+      type: object
+      required:
+        - senderId
+        - receiverId
+        - amount
+      properties:
+        senderId:
+          type: integer
+          format: int64
+          description: Unique ID of the sender's account
+          example: 1
+        receiverId:
+          type: integer
+          format: int64
+          description: Unique ID of the receiver's account
+          example: 2
+        amount:
+          type: number
+          format: float
+          description: Amount to be transferred
+          example: 100.00
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique transaction ID
+          example: 10
+        senderAccountId:
+          type: integer
+          format: int64
+          description: Sender account ID
+          example: 1
+        receiverAccountId:
+          type: integer
+          format: int64
+          description: Receiver account ID
+          example: 2
+        amount:
+          type: number
+          format: float
+          description: Amount transferred
+          example: 100.00
+        timestamp:
+          type: string
+          format: date-time
+          description: When the transaction was processed
+          example: "2025-04-06T07:10:15.123"

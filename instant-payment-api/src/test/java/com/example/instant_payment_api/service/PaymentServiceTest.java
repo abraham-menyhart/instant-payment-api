@@ -1,7 +1,7 @@
 package com.example.instant_payment_api.service;
 
+import com.example.instant_payment_api.dto.TransactionResponse;
 import com.example.instant_payment_api.model.Account;
-import com.example.instant_payment_api.model.Transaction;
 import com.example.instant_payment_api.repository.AccountRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class PaymentServiceTest {
         accountRepository.save(receiver);
 
         // Payment
-        Transaction tx = paymentService.processPayment(sender.getId(), receiver.getId(), BigDecimal.valueOf(100));
+        TransactionResponse tx = paymentService.processPayment(sender.getId(), receiver.getId(), BigDecimal.valueOf(100));
 
         // Assertions
         assertNotNull(tx.getId());

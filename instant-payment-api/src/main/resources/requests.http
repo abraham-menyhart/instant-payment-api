@@ -1,0 +1,36 @@
+### Send payment from account 1 to account 2
+POST http://localhost:8080/api/payments
+Content-Type: application/json
+Accept: application/json
+
+{
+  "senderId": 1,
+  "receiverId": 2,
+  "amount": 100.00
+}
+
+###
+
+### Another example: Send payment from account 2 to account 3
+POST http://localhost:8080/api/payments
+Content-Type: application/json
+Accept: application/json
+
+{
+  "senderId": 2,
+  "receiverId": 3,
+  "amount": 50.75
+}
+
+###
+
+### Edge case: Insufficient balance (invalid input)
+POST http://localhost:8080/api/payments
+Content-Type: application/json
+Accept: application/json
+
+{
+  "senderId": 1,
+  "receiverId": 2,
+  "amount": 9999999
+}

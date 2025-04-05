@@ -1,5 +1,6 @@
 package com.example.instant_payment_api.service;
 
+import com.example.instant_payment_api.dto.TransactionResponse;
 import com.example.instant_payment_api.model.Account;
 import com.example.instant_payment_api.model.Transaction;
 import com.example.instant_payment_api.repository.AccountRepository;
@@ -21,7 +22,7 @@ public class PaymentService {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Transactional
-    public Transaction processPayment(Long senderId, Long receiverId, BigDecimal amount) {
+    public TransactionResponse processPayment(Long senderId, Long receiverId, BigDecimal amount) {
         Account sender = getAccountForUpdate(senderId, "Sender account not found.");
         Account receiver = getAccountForUpdate(receiverId, "Receiver account not found.");
 
@@ -35,7 +36,13 @@ public class PaymentService {
 
         publishNotification(senderId, receiverId, amount);
 
-        return transaction;
+        return TransactionResponse.builder()
+                .id(transaction.getId())
+                .senderAccountId(transaction.getSenderAccountId())
+                .receiverAccountId(transaction.getReceiverAccountId())
+                .amount(transaction.getAmount())
+                .timestamp(transaction.getTimestamp())
+                .build();
     }
 
     private Account getAccountForUpdate(Long accountId, String errorMessage) {
