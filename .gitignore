@@ -23,7 +23,6 @@ Thumbs.db
 
 # === Test output ===
 *.txt
-*.xml
 surefire-reports/
 
 
