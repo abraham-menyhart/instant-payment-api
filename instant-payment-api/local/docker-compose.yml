@@ -1,29 +1,9 @@
 version: '3.8'
+
 services:
-  app:
-    # We'll build the Dockerfile from your local code
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: instant-payment-api
-    depends_on:
-      - postgres
-      - kafka
-    ports:
-      - "8080:8080"
-    environment:
-      # Adjust DB host/port to match Postgres service name and port
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/localdb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-
-      # Kafka bootstrap servers
-      SPRING_KAFKA_BOOTSTRAP-SERVERS: kafka:9092
-
-
   postgres:
     image: postgres:16
-    container_name: postgres
+    container_name: local-postgres
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -33,16 +13,18 @@ services:
 
   kafka:
     image: bitnami/kafka:latest
-    container_name: kafka-kraft
+    container_name: local-kafka-kraft
     environment:
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+
+
     ports:
       - "9092:9092"
       - "9093:9093"

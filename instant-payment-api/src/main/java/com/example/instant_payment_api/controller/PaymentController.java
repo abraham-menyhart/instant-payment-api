@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
@@ -23,16 +21,7 @@ public class PaymentController {
 
     @PostMapping
     public ResponseEntity<TransactionResponse> sendMoney(@RequestBody PaymentRequest request) {
-        try {
-            TransactionResponse transaction = paymentService.processPayment(
-                    request.getSenderId(),
-                    request.getReceiverId(),
-                    request.getAmount()
-            );
-            return ResponseEntity.ok(transaction);
-        } catch (Exception e) {
-            log.error("Exception during `payments` request", e);
-            return ResponseEntity.status(BAD_REQUEST).build();
-        }
+        TransactionResponse transaction = paymentService.processPayment(request);
+        return ResponseEntity.ok(transaction);
     }
 }

@@ -24,6 +24,19 @@ Accept: application/json
 
 ###
 
+### Account Id is incorrect
+POST http://localhost:8080/api/payments
+Content-Type: application/json
+Accept: application/json
+
+{
+  "senderId": 12313,
+  "receiverId": 12341234,
+  "amount": 50.00
+}
+
+###
+
 ### Edge case: Insufficient balance (invalid input)
 POST http://localhost:8080/api/payments
 Content-Type: application/json

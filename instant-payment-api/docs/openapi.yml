@@ -3,9 +3,7 @@ info:
   title: Instant Payment API
   version: "1.0.0"
   description: |
-    This API handles instant payment transactions from one account
-    to another, storing the transaction in a PostgreSQL database
-    and notifying via Kafka.
+    This API handles money transfers between accounts and returns a transaction record.
 
 servers:
   - url: http://localhost:8080
@@ -14,8 +12,10 @@ servers:
 paths:
   /api/payments:
     post:
-      summary: Send money from one account to another
-      description: Transfers the specified amount from `senderId` to `receiverId`.
+      summary: "Send money from one account to another"
+      description: >
+        Transfers the specified amount from senderId to receiverId.  
+        Returns a `TransactionResponse` with details of the transaction.
       requestBody:
         required: true
         content:
@@ -24,13 +24,13 @@ paths:
               $ref: '#/components/schemas/PaymentRequest'
       responses:
         '200':
-          description: Successful transfer
+          description: "Payment succeeded"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Transaction'
+                $ref: '#/components/schemas/TransactionResponse'
         '400':
-          description: Failed to process (e.g. insufficient balance, invalid input)
+          description: "Payment failed (e.g. insufficient balance, invalid input)"
 
 components:
   schemas:
@@ -44,44 +44,44 @@ components:
         senderId:
           type: integer
           format: int64
-          description: Unique ID of the sender's account
+          description: "ID of the account sending funds"
           example: 1
         receiverId:
           type: integer
           format: int64
-          description: Unique ID of the receiver's account
+          description: "ID of the account receiving funds"
           example: 2
         amount:
           type: number
-          format: float
-          description: Amount to be transferred
+          format: double
+          description: "Amount to be transferred"
           example: 100.00
 
-    Transaction:
+    TransactionResponse:
       type: object
       properties:
         id:
           type: integer
           format: int64
-          description: Unique transaction ID
+          description: "ID of the transaction record"
           example: 10
         senderAccountId:
           type: integer
           format: int64
-          description: Sender account ID
+          description: "The sender's account ID"
           example: 1
         receiverAccountId:
           type: integer
           format: int64
-          description: Receiver account ID
+          description: "The receiver's account ID"
           example: 2
         amount:
           type: number
-          format: float
-          description: Amount transferred
+          format: double
+          description: "Amount that was transferred"
           example: 100.00
         timestamp:
           type: string
           format: date-time
-          description: When the transaction was processed
-          example: "2025-04-06T07:10:15.123"
+          description: "Timestamp of the transaction"
+          example: "2025-04-06T12:34:56"
