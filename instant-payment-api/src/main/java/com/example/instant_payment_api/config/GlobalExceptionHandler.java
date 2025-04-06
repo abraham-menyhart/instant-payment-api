@@ -1,6 +1,6 @@
 package com.example.instant_payment_api.config;
 
-import com.example.instant_payment_api.AccountNotFoundException;
+import com.example.instant_payment_api.exception.AccountNotFoundException;
 import com.example.instant_payment_api.exception.InsufficientBalanceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

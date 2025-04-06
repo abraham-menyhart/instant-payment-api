@@ -1,4 +1,4 @@
-package com.example.instant_payment_api;
+package com.example.instant_payment_api.exception;
 
 public class AccountNotFoundException extends RuntimeException {
     public AccountNotFoundException(Long accountId) {
